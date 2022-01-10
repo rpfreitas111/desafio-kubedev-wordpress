@@ -1,0 +1,36 @@
+version: '3.9'
+volumes:
+  maria_vol:
+  wordpress_vol:
+networks:
+  net_wordpress:
+    driver: bridge
+services:
+  mariadb:
+    image: mariadb:10.7
+    ports:
+      - 3306:3306
+    networks:
+      - net_wordpress
+    environment:
+      MARIADB_DATABASE: mywordpress
+      MARIADB_USER: mariauser
+      MARIADB_RANDOM_ROOT_PASSWORD: '1'
+      MARIADB_PASSWORD: mariapwd
+    volumes:
+      - maria_vol:/var/lib/mysql
+  wordpress:
+    image: wordpress:5.8
+    volumes:
+      - wordpress_vol:/var/www/html
+    ports:
+      - 80:80
+    networks:
+      - net_wordpress
+    environment:
+      WORDPRESS_DB_HOST: mariadb 
+      WORDPRESS_DB_USER: mariauser
+      WORDPRESS_DB_PASSWORD: mariapwd
+      WORDPRESS_DB_NAME: mywordpress
+    depends_on:
+      - mariadb
